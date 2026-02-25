@@ -128,11 +128,16 @@ if __name__ == "__main__":
     sp500_df = sp500_df.rename(columns={"Symbol": "Ticker"})
     nasdaq_df = nasdaq_df.rename(columns={"Ticker": "Ticker"})  # harmless
     
-
+    
     sp_tickers = sp500_df["Ticker"].tolist()
     nq_tickers = nasdaq_df["Ticker"].tolist()
     dax_tickers = dax_df["Ticker"].tolist()
     euro_tickers = euro_df["Ticker"].tolist()
+
+    print("SP500 rows:", len(sp500_df))
+    print("NASDAQ rows:", len(nasdaq_df))
+    print("DAX rows:", len(dax_df))
+    print("EURO rows:", len(euro_df))
 
     top_sp, worst_sp = build_index_evolution(sp_tickers)
     top_nq, worst_nq = build_index_evolution(nq_tickers)
@@ -206,5 +211,6 @@ if __name__ == "__main__":
         EMAIL_TO   = os.getenv("EMAIL_TO")
 
     )
+
 
 
