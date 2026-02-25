@@ -183,5 +183,9 @@ if __name__ == "__main__":
     print("=== Euronext 100: Worst 10 Performers ===")
     print(worst_euro[["Name","Live_Price","Prev_Close","%_vs_Prev_Close","%_vs_1W_Ago","%_vs_1M_Ago","%_vs_1Y_Ago","Industry","Sector"]])
 
+    print("NaN count in % column:", df["%_vs_Prev_Close"].isna().sum())
+    print("Non-NaN count:", df["%_vs_Prev_Close"].notna().sum())
+
+
 
 
