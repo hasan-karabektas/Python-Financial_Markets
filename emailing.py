@@ -22,13 +22,23 @@ def dataframe_to_html(df):
         "Currency"
     ]]
 
-    def format_price(row, column_name):
-        if row["Currency"] == "USD":
-            return f"${row[column_name]:,.2f}"
-        elif row["Currency"] == "EUR":
-            return f"€{row[column_name]:,.2f}"
+def format_price(row, column_name):
+    val = row[column_name]
+    
+    if val is None or pd.isna(val):
+        return "N/A"
+
+    currency = row.get("Currency", "EUR") # Default to EUR if column is missing
+    
+    try:
+        if currency == "USD":
+            return f"${val:,.2f}"
+        elif currency == "EUR":
+            return f"€{val:,.2f}"
         else:
-            return f"{row[column_name]:,.2f}"
+            return f"{val:,.2f} {currency}"
+    except (TypeError, ValueError):
+        return "N/A"
 
     df["Live_Price"] = df.apply(lambda row: format_price(row, "Live_Price"), axis=1)
     df["Prev_Close"] = df.apply(lambda row: format_price(row, "Prev_Close"), axis=1)
@@ -195,4 +205,5 @@ if __name__ == "__main__":
         EMAIL_USER = os.getenv("EMAIL_USER"),
         EMAIL_PASS = os.getenv("EMAIL_PASS"),
         EMAIL_TO   = os.getenv("EMAIL_TO")
+
     )
