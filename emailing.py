@@ -95,18 +95,17 @@ def build_index_section(index_name, top_df, worst_df, currency):
     return section
 
 
-def send_email(subject, html_content, sender, password, recipients):
+def send_email(subject, html_content, EMAIL_USER, EMAIL_PASS, EMAIL_TO)):
 
     msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = ", ".join(recipients)
-    msg["Subject"] = subject
-
+    msg['Subject'] = subject
+    msg['From'] = EMAIL_USER
+    msg['To'] = EMAIL_TO
     msg.attach(MIMEText(html_content, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender, password)
-        server.sendmail(sender, recipients, msg.as_string())
+        server.login(EMAIL_USER, EMAIL_PASS)
+        server.send_message(msg)
 
     print("Email successfully sent.")
 
@@ -207,3 +206,4 @@ if __name__ == "__main__":
         EMAIL_TO   = os.getenv("EMAIL_TO")
 
     )
+
