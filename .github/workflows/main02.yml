@@ -1,4 +1,4 @@
-name: Run Financial Report
+name: Run Realtime Evolution Calculator
 
 on:
   schedule:
