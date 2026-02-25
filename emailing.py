@@ -3,10 +3,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 import pytz
+import pandas as pd
 
 
 def dataframe_to_html(df):
-
 
     df = df[[
         "Name",
@@ -22,23 +22,23 @@ def dataframe_to_html(df):
         "Currency"
     ]]
 
-def format_price(row, column_name):
-    val = row[column_name]
-    
-    if val is None or pd.isna(val):
-        return "N/A"
+    def format_price(row, column_name):
+        val = row[column_name]
 
-    currency = row.get("Currency", "EUR") # Default to EUR if column is missing
-    
-    try:
-        if currency == "USD":
-            return f"${val:,.2f}"
-        elif currency == "EUR":
-            return f"€{val:,.2f}"
-        else:
-            return f"{val:,.2f} {currency}"
-    except (TypeError, ValueError):
-        return "N/A"
+        if val is None or pd.isna(val):
+            return "N/A"
+
+        currency = row.get("Currency", "EUR")
+
+        try:
+            if currency == "USD":
+                return f"${val:,.2f}"
+            elif currency == "EUR":
+                return f"€{val:,.2f}"
+            else:
+                return f"{val:,.2f} {currency}"
+        except (TypeError, ValueError):
+            return "N/A"
 
     df["Live_Price"] = df.apply(lambda row: format_price(row, "Live_Price"), axis=1)
     df["Prev_Close"] = df.apply(lambda row: format_price(row, "Prev_Close"), axis=1)
@@ -53,10 +53,8 @@ def format_price(row, column_name):
     for col in percent_cols:
         df[col] = df[col].map(lambda x: f"{x:.2f}%")
 
-
     df["Name"] = df["Name"].apply(lambda x: f"<b>{x}</b>")
     df["%_vs_Prev_Close"] = df["%_vs_Prev_Close"].apply(lambda x: f"<b>{x}</b>")
-
 
     df = df.drop(columns=["Currency"])
 
@@ -211,6 +209,7 @@ if __name__ == "__main__":
         EMAIL_TO   = os.getenv("EMAIL_TO")
 
     )
+
 
 
 
