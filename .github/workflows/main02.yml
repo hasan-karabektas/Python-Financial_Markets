@@ -1,0 +1,26 @@
+name: Run Financial Report
+
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'   # 11:00 CET (approx, GitHub triggers can be delayed)
+
+  workflow_dispatch:        # Allows you to click "Run workflow" manually for testing
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4  # Use v4 (latest stable)
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # 3.14 is currently in pre-release; 3.12 is the stable choice
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Script 05
+        run: python realtime_evolution.py
