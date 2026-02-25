@@ -95,7 +95,7 @@ def build_index_section(index_name, top_df, worst_df, currency):
     return section
 
 
-def send_email(subject, html_content, EMAIL_USER, EMAIL_PASS, EMAIL_TO)):
+def send_email(subject, html_content, EMAIL_USER, EMAIL_PASS, EMAIL_TO):
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
@@ -206,4 +206,5 @@ if __name__ == "__main__":
         EMAIL_TO   = os.getenv("EMAIL_TO")
 
     )
+
 
