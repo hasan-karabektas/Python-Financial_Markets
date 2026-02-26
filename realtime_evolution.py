@@ -183,6 +183,11 @@ if __name__ == "__main__":
     print("=== Euronext 100: Worst 10 Performers ===")
     print(worst_euro[["Name","Live_Price","Prev_Close","%_vs_Prev_Close","%_vs_1W_Ago","%_vs_1M_Ago","%_vs_1Y_Ago","Industry","Sector"]])
 
+top, worst = build_index_evolution(sp_tickers)
+top, worst = build_index_evolution(nq_tickers)
+top, worst = build_index_evolution(dax_tickers)
+top, worst = build_index_evolution(euro_tickers)
+
 
 
 
