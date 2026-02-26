@@ -101,7 +101,7 @@ def build_index_evolution(tickers, period="2y"):
     df = compute_realtime_evolution(tickers, reference)
 
     top, worst = rank_performers(df)
-
+    print("Sample Euronext tickers:", tickers[:10])
     return top, worst
 
 if __name__ == "__main__":
@@ -182,6 +182,7 @@ if __name__ == "__main__":
 
     print("=== Euronext 100: Worst 10 Performers ===")
     print(worst_euro[["Name","Live_Price","Prev_Close","%_vs_Prev_Close","%_vs_1W_Ago","%_vs_1M_Ago","%_vs_1Y_Ago","Industry","Sector"]])
+
 
 
 
