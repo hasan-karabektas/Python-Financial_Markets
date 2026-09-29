@@ -3,3 +3,4 @@ yfinance
 requests
 pytz
 lxml
+html5lib
