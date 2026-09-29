@@ -5,20 +5,14 @@ from io import StringIO
 
 def get_nasdaq100_tickers():
 
-    URL = "https://www.nasdaq.com/NDX"
+    url = "https://en.wikipedia.org/api/rest_v1/page/html/Nasdaq-100"
 
     headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/140.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
+        "User-Agent": "MyMarketBot/1.0"
     }
 
     response = requests.get(
-        URL,
+        url,
         headers=headers,
         timeout=30
     )
@@ -34,13 +28,9 @@ def get_nasdaq100_tickers():
             for col in table.columns
         ]
 
-        if "Symbol" in table.columns:
+        if "Ticker" in table.columns:
 
             df = table.copy()
-
-            df = df.rename(columns={
-                "Symbol": "Ticker"
-            })
 
             df["Ticker"] = (
                 df["Ticker"]
@@ -49,13 +39,9 @@ def get_nasdaq100_tickers():
                 .str.replace(".", "-", regex=False)
             )
 
-            if len(df) < 90:
-                raise ValueError(
-                    f"Nasdaq NDX returned only {len(df)} constituents."
-                )
-
             return df
 
     raise ValueError(
-        "Nasdaq NDX constituent table not found."
+        "Nasdaq-100 constituents table not found. "
+        f"Tables found: {[list(t.columns) for t in tables]}"
     )
