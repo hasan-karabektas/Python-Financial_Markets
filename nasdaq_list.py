@@ -1,76 +1,61 @@
 import requests
 import pandas as pd
+from io import StringIO
 
 
 def get_nasdaq100_tickers():
 
-    url = "https://api.nasdaq.com/api/quote/NDX/holdings"
+    URL = "https://www.nasdaq.com/NDX"
 
     headers = {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json, text/plain, */*",
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/140.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
-        "Referer": "https://www.nasdaq.com/",
-        "Origin": "https://www.nasdaq.com",
     }
 
     response = requests.get(
-        url,
+        URL,
         headers=headers,
         timeout=30
     )
 
     response.raise_for_status()
 
-    data = response.json()
+    tables = pd.read_html(StringIO(response.text))
 
-    # Check the API response
-    if not data.get("data"):
-        raise ValueError(
-            f"Unexpected Nasdaq API response: {data}"
-        )
+    for table in tables:
 
-    rows = data["data"].get("rows", [])
+        table.columns = [
+            str(col).strip()
+            for col in table.columns
+        ]
 
-    if not rows:
-        raise ValueError(
-            "Nasdaq API returned no NDX constituents."
-        )
+        if "Symbol" in table.columns:
 
-    df = pd.DataFrame(rows)
+            df = table.copy()
 
-    # Find the ticker column
-    ticker_column = None
+            df = df.rename(columns={
+                "Symbol": "Ticker"
+            })
 
-    for col in df.columns:
-        if col.lower() in {
-            "symbol",
-            "symbols",
-            "ticker",
-            "securitysymbol"
-        }:
-            ticker_column = col
-            break
+            df["Ticker"] = (
+                df["Ticker"]
+                .astype(str)
+                .str.strip()
+                .str.replace(".", "-", regex=False)
+            )
 
-    if ticker_column is None:
-        raise ValueError(
-            f"Could not identify ticker column. "
-            f"Columns returned: {list(df.columns)}"
-        )
+            if len(df) < 90:
+                raise ValueError(
+                    f"Nasdaq NDX returned only {len(df)} constituents."
+                )
 
-    df = df.rename(columns={ticker_column: "Ticker"})
+            return df
 
-    df["Ticker"] = (
-        df["Ticker"]
-        .astype(str)
-        .str.strip()
-        .str.replace(".", "-", regex=False)
+    raise ValueError(
+        "Nasdaq NDX constituent table not found."
     )
-
-    # Sanity check
-    if len(df) < 90:
-        raise ValueError(
-            f"Nasdaq API returned only {len(df)} constituents."
-        )
-
-    return df
