@@ -1,70 +1,60 @@
 import requests
 import pandas as pd
-from io import StringIO
+
 
 def get_nasdaq100_tickers():
 
-    API_URL = "https://en.wikipedia.org/w/api.php"
-
-    params = {
-        "action": "parse",
-        "page": "Nasdaq-100",
-        "prop": "text",
-        "format": "json",
-        "formatversion": "2"
-    }
+    URL = "https://indexes.nasdaq.com/Index/Breakdown/NDX"
 
     headers = {
-        "User-Agent": "MyMarketBot/1.0 (contact@example.com)"
+        "User-Agent": "MyMarketBot/1.0"
     }
 
-    with requests.Session() as session:
+    response = requests.get(
+        URL,
+        headers=headers,
+        timeout=30
+    )
 
-        response = session.get(
-            API_URL,
-            params=params,
-            headers=headers,
-            timeout=30
-        )
+    response.raise_for_status()
 
-        response.raise_for_status()
-
-        data = response.json()
-
-    # Check that the expected API response exists
-    if "parse" not in data:
-        raise ValueError(f"Unexpected Wikipedia API response: {data}")
-
-    html = data["parse"]["text"]
-
-    tables = pd.read_html(StringIO(html))
-
-    # Find the Nasdaq-100 constituents table
-    df = None
+    tables = pd.read_html(response.text)
 
     for table in tables:
-        # Normalize column names
+
         table.columns = [
             str(col).strip()
             for col in table.columns
         ]
 
-        if "Ticker" in table.columns:
+        symbol_columns = [
+            col for col in table.columns
+            if str(col).upper() == "SYMBOL"
+        ]
+
+        if symbol_columns:
+
             df = table.copy()
-            break
+            df = df.rename(
+                columns={symbol_columns[0]: "Ticker"}
+            )
 
-    if df is None:
-        raise ValueError(
-            "Nasdaq-100 constituents table not found. "
-            f"Available columns: {[list(t.columns) for t in tables]}"
-        )
+            df["Ticker"] = (
+                df["Ticker"]
+                .astype(str)
+                .str.strip()
+                .str.replace(".", "-", regex=False)
+            )
 
-    # Clean ticker column
-    df["Ticker"] = (
-        df["Ticker"]
-        .astype(str)
-        .str.strip()
-        .str.replace(".", "-", regex=False)
+            # Basic sanity check
+            if len(df) < 90:
+                raise ValueError(
+                    f"Nasdaq returned only {len(df)} constituents. "
+                    "The page structure may have changed."
+                )
+
+            return df
+
+    raise ValueError(
+        "Could not find Nasdaq-100 constituent table."
     )
-
-    return df
