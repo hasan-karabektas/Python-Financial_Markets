@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4  # Use v4 (latest stable)
+        uses: actions/checkout@v5  # Use v4 (latest stable)
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'   # 3.14 is currently in pre-release; 3.12 is the stable choice
 
