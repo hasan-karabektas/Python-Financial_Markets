@@ -5,14 +5,14 @@ from io import StringIO
 
 def get_nasdaq100_tickers():
 
-    url = "https://en.wikipedia.org/api/rest_v1/page/html/Nasdaq-100"
+    URL = "https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies"
 
     headers = {
         "User-Agent": "MyMarketBot/1.0"
     }
 
     response = requests.get(
-        url,
+        URL,
         headers=headers,
         timeout=30
     )
@@ -23,6 +23,7 @@ def get_nasdaq100_tickers():
 
     for table in tables:
 
+        # Clean column names
         table.columns = [
             str(col).strip()
             for col in table.columns
@@ -32,6 +33,7 @@ def get_nasdaq100_tickers():
 
             df = table.copy()
 
+            # Clean ticker symbols
             df["Ticker"] = (
                 df["Ticker"]
                 .astype(str)
